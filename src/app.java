@@ -55,5 +55,27 @@ public class app {
 		System.out.println("Connected.");
 		return conn;
 	}
+	
+//	/**
+//	 * Code Snippet to get the names of all the tables in the requested database
+//	 */
+//	DatabaseMetaData md = conn.getMetaData();
+//	ResultSet rs = md.getTables(null, null, "%", null);
+//	while (rs.next()) {
+//	  System.out.println(rs.getString(3));
+//	}
+	
+//	/**
+//	 * Code Snippet to get the names of all the columns in a result from a query
+//	 */
+//	ResultSet rs = stmt.executeQuery("SELECT a, b, c FROM TABLE2");
+//	ResultSetMetaData rsmd = rs.getMetaData();
+//	int columnCount = rsmd.getColumnCount();
+//
+//	// The column count starts from 1
+//	for (int i = 1; i < columnCount + 1; i++ ) {
+//	  String name = rsmd.getColumnName(i);
+//	  // Do stuff with name
+//	}
 
 }
