@@ -18,25 +18,27 @@ public class app {
 		Connection conn = null;
 		Class.forName("com.mysql.jdbc.Driver");
 		System.out.println("test");
-		conn = getConnection("", "");
+		conn = getConnection("root", "");
 		
 		//Query the DB
 		Statement stmt = null;
-		String query = "SELECT * FROM countries";
+		String query = "SELECT * FROM actor";
 		try {
 			stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(query);
 			while (rs.next()) {
-	            String countryID = rs.getString("COUNTRY_ID");
-	            String countryName = rs.getString("COUNTRY_NAME");
-	            int regionID = rs.getInt("REGION_ID");
-	            System.out.println(countryID + "\t" + countryName + "\t" + regionID);
+	            int actorID = rs.getInt("actor_id");
+	            String firstName = rs.getString("first_name");
+	            String lastName = rs.getString("last_name");
+	            System.out.println(actorID + "\t" + firstName + "\t" + lastName);
 	        }
 		} catch (SQLException e) {
 			
 		} finally {
 			if (stmt != null) { stmt.close(); }
 		}
+		
+		conn.close();
 	}
 	
 	public static Connection getConnection(String username, String password) throws SQLException, ClassNotFoundException {
@@ -46,7 +48,7 @@ public class app {
 		connProp.put("user", username);
 		connProp.put("password", password);
 		
-		String url = "";
+		String url = "localhost:3306/sakila";
 		
 		Class.forName("com.mysql.jdbc.Driver");
 		conn = DriverManager.getConnection("jdbc:mysql://" + url, connProp);
