@@ -12,51 +12,54 @@ import java.util.Properties;
  */
 public class SQLConnection {
 
-	public static void main(String[] args) throws ClassNotFoundException, SQLException {
-
+	//Instance variables
+	Connection conn = null;
+	
+	/**
+	 * Create the database connection
+	 * @param username
+	 * @param password
+	 * @throws ClassNotFoundException
+	 * @throws SQLException
+	 */
+	public SQLConnection(String username, String password) throws ClassNotFoundException, SQLException {
 		//Create the connection
-		Connection conn = null;
 		Class.forName("com.mysql.jdbc.Driver");
-//		System.out.println("test");
-		conn = getConnection("root", "");
-		
+		conn = getConnection(username, password);
+	}
+	
+	/**
+	 * Query the database with our connection
+	 * @param query
+	 * @throws SQLException
+	 */
+	public void query(String query) throws SQLException {
 		//Query the DB
 		Statement stmt = null;
-		String query = "SELECT * FROM actor";
 		try {
 			stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(query);
-			while (rs.next()) {
-	            int actorID = rs.getInt("actor_id");
-	            String firstName = rs.getString("first_name");
-	            String lastName = rs.getString("last_name");
-	            System.out.println(actorID + "\t" + firstName + "\t" + lastName);
-	        }
+			
+//			while (rs.next()) {
+//	            int actorID = rs.getInt("actor_id");
+//	            String firstName = rs.getString("first_name");
+//	            String lastName = rs.getString("last_name");
+//	            System.out.println(actorID + "\t" + firstName + "\t" + lastName);
+//	        }
 		} catch (SQLException e) {
 			
 		} finally {
 			if (stmt != null) { stmt.close(); }
 		}
-		
-		conn.close();
 	}
 	
-	public static Connection getConnection(String username, String password) throws SQLException, ClassNotFoundException {
-		
-		Connection conn = null;
-		Properties connProp = new Properties();
-		connProp.put("user", username);
-		connProp.put("password", password);
-		
-		String url = "localhost:3306/sakila";
-		
-		Class.forName("com.mysql.jdbc.Driver");
-		conn = DriverManager.getConnection("jdbc:mysql://" + url, connProp);
-		System.out.println("Connected.");
-		return conn;
-	}
-	
-	public static String[] getTables(Connection conn) throws SQLException {
+	/**
+	 * Get the names of all the tables
+	 * @param conn
+	 * @return
+	 * @throws SQLException
+	 */
+	public String[] getTables() throws SQLException {
 		DatabaseMetaData md = conn.getMetaData();
 		ResultSet rs = md.getTables(null, null, "%", null);
 		
@@ -74,7 +77,57 @@ public class SQLConnection {
 		return tables;
 	}
 	
-	private static int sizeOfResultSet(ResultSet rs) throws SQLException {
+	/**
+	 * Get the names of all the columns in a given table
+	 * @param table
+	 * @return
+	 * @throws SQLException 
+	 */
+	public String[] getColumns(String table) throws SQLException {
+		ResultSetMetaData rsmd = conn.createStatement().executeQuery("SELECT * FROM " + table).getMetaData();
+		int columnCount = rsmd.getColumnCount();
+	
+		//Create the array
+		String[] columns = new String[columnCount];
+		
+		// The column count starts from 1
+		for (int i = 1; i < columnCount + 1; i++ ) {
+		  columns[i-1] = rsmd.getColumnName(i);
+		}
+		
+		return columns;
+	}
+	
+	/**
+	 * Get a connection using our username and password
+	 * @param username
+	 * @param password
+	 * @return
+	 * @throws SQLException
+	 * @throws ClassNotFoundException
+	 */
+	private Connection getConnection(String username, String password) throws SQLException, ClassNotFoundException {
+		
+		Connection conn = null;
+		Properties connProp = new Properties();
+		connProp.put("user", username);
+		connProp.put("password", password);
+		
+		String url = "localhost:3306/sakila";
+		
+		Class.forName("com.mysql.jdbc.Driver");
+		conn = DriverManager.getConnection("jdbc:mysql://" + url, connProp);
+		System.out.println("Connected.");
+		return conn;
+	}
+	
+	/**
+	 * Gets the size of an input ResultSet
+	 * @param rs
+	 * @return
+	 * @throws SQLException
+	 */
+	private int sizeOfResultSet(ResultSet rs) throws SQLException {
 		int rowCount = 0;
 		if (rs.last()) {
 			  rowCount = rs.getRow();
@@ -82,27 +135,4 @@ public class SQLConnection {
 		}
 		return rowCount;
 	}
-		
-//	/**
-//	 * Code Snippet to get the names of all the tables in the requested database
-//	 */
-//	DatabaseMetaData md = conn.getMetaData();
-//	ResultSet rs = md.getTables(null, null, "%", null);
-//	while (rs.next()) {
-//	  System.out.println(rs.getString(3));
-//	}
-	
-//	/**
-//	 * Code Snippet to get the names of all the columns in a result from a query
-//	 */
-//	ResultSet rs = stmt.executeQuery("SELECT a, b, c FROM TABLE2");
-//	ResultSetMetaData rsmd = rs.getMetaData();
-//	int columnCount = rsmd.getColumnCount();
-//
-//	// The column count starts from 1
-//	for (int i = 1; i < columnCount + 1; i++ ) {
-//	  String name = rsmd.getColumnName(i);
-//	  // Do stuff with name
-//	}
-
 }
