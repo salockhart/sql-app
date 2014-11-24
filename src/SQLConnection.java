@@ -1,6 +1,8 @@
 import java.sql.*;
-import java.util.Properties;
+import java.util.*;
 
+import javax.swing.*;
+import javax.swing.table.*;
 
 /**
  * SQLConnection.java
@@ -22,10 +24,18 @@ public class SQLConnection {
 	 * @throws ClassNotFoundException
 	 * @throws SQLException
 	 */
-	public SQLConnection(String username, String password) throws ClassNotFoundException, SQLException {
+	public SQLConnection(String username, String password) {
 		//Create the connection
-		Class.forName("com.mysql.jdbc.Driver");
-		conn = getConnection(username, password);
+		try {
+			Class.forName("com.mysql.jdbc.Driver");
+			conn = getConnection(username, password);
+		} catch (ClassNotFoundException e) {
+			JOptionPane.showMessageDialog(null, e + "SQL Driver not found - please install from"
+					+ "http://dev.mysql.com/downloads/connector/j/ and try again",
+					"ClassNotFound Exception", JOptionPane.ERROR_MESSAGE);
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, e, "SQL Exception", JOptionPane.ERROR_MESSAGE);
+		}
 	}
 	
 	/**
@@ -33,24 +43,26 @@ public class SQLConnection {
 	 * @param query
 	 * @throws SQLException
 	 */
-	public void query(String query) throws SQLException {
+	public JTable query(String query) {
 		//Query the DB
 		Statement stmt = null;
+		JTable table = null;
 		try {
 			stmt = conn.createStatement();
 			ResultSet rs = stmt.executeQuery(query);
-			
-//			while (rs.next()) {
-//	            int actorID = rs.getInt("actor_id");
-//	            String firstName = rs.getString("first_name");
-//	            String lastName = rs.getString("last_name");
-//	            System.out.println(actorID + "\t" + firstName + "\t" + lastName);
-//	        }
+			table = new JTable(buildTableModel(rs));
 		} catch (SQLException e) {
-			
+			JOptionPane.showMessageDialog(null, e, "SQL Exception", JOptionPane.ERROR_MESSAGE);
 		} finally {
-			if (stmt != null) { stmt.close(); }
+			try {
+				if (stmt != null) {
+					stmt.close();
+				}
+			} catch (SQLException e) {
+				JOptionPane.showMessageDialog(null, e, "SQL Exception", JOptionPane.ERROR_MESSAGE);
+			}
 		}
+		return table;
 	}
 	
 	/**
@@ -59,22 +71,27 @@ public class SQLConnection {
 	 * @return
 	 * @throws SQLException
 	 */
-	public String[] getTables() throws SQLException {
-		DatabaseMetaData md = conn.getMetaData();
-		ResultSet rs = md.getTables(null, null, "%", null);
-		
-		//Get the number of tables
-		int rowCount = sizeOfResultSet(rs);
-		
-		//Create the array
-		String[] tables = new String[rowCount];
-		
-		//Add to the array
-		int i = 0;
-		while (rs.next())
-		  tables[i++] = rs.getString(3);
-		
-		return tables;
+	public String[] getTables() {
+		try {
+			DatabaseMetaData md = conn.getMetaData();
+			ResultSet rs = md.getTables(null, null, "%", null);
+			
+			//Get the number of tables
+			int rowCount = sizeOfResultSet(rs);
+			
+			//Create the array
+			String[] tables = new String[rowCount];
+			
+			//Add to the array
+			int i = 0;
+			while (rs.next())
+			  tables[i++] = rs.getString(3);
+			
+			return tables;
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, e, "SQL Exception", JOptionPane.ERROR_MESSAGE);
+			return null;
+		}
 	}
 	
 	/**
@@ -83,19 +100,24 @@ public class SQLConnection {
 	 * @return
 	 * @throws SQLException 
 	 */
-	public String[] getColumns(String table) throws SQLException {
-		ResultSetMetaData rsmd = conn.createStatement().executeQuery("SELECT * FROM " + table).getMetaData();
-		int columnCount = rsmd.getColumnCount();
-	
-		//Create the array
-		String[] columns = new String[columnCount];
-		
-		// The column count starts from 1
-		for (int i = 1; i < columnCount + 1; i++ ) {
-		  columns[i-1] = rsmd.getColumnName(i);
+	public String[] getColumns(ResultSet rs) {
+		try {
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int columnCount = rsmd.getColumnCount();
+
+			//Create the array
+			String[] columns = new String[columnCount];
+
+			// The column count starts from 1
+			for (int i = 1; i < columnCount + 1; i++) {
+				columns[i - 1] = rsmd.getColumnName(i);
+			}
+
+			return columns;
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, e, "SQL Exception", JOptionPane.ERROR_MESSAGE);
+			return null;
 		}
-		
-		return columns;
 	}
 	
 	/**
@@ -134,5 +156,32 @@ public class SQLConnection {
 			  rs.beforeFirst(); // not rs.first() because using rs.next() later will move over the first element
 		}
 		return rowCount;
+	}
+	
+	/**
+	 * Builds and returns a table made from a result set
+	 * @param rs
+	 * @return
+	 * @throws SQLException
+	 */
+	private DefaultTableModel buildTableModel(ResultSet rs) throws SQLException {
+		//Get column names
+		Vector<String> columns = new Vector<String>();
+		String[] columnNames = getColumns(rs);
+		for (String s : columnNames)
+			columns.add(s);
+		
+		//Get table data
+		Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+		int columnCount = rs.getMetaData().getColumnCount();
+		while (rs.next()) {
+			Vector<Object> vector = new Vector<Object>();
+	        for (int columnIndex = 1; columnIndex <= columnCount; columnIndex++) {
+	            vector.add(rs.getObject(columnIndex));
+	        }
+	        data.add(vector);
+		}
+		
+		return new DefaultTableModel(data, columns);
 	}
 }
