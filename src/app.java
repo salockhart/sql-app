@@ -17,7 +17,7 @@ public class app {
 		//Create the connection
 		Connection conn = null;
 		Class.forName("com.mysql.jdbc.Driver");
-		System.out.println("test");
+//		System.out.println("test");
 		conn = getConnection("root", "");
 		
 		//Query the DB
@@ -56,6 +56,33 @@ public class app {
 		return conn;
 	}
 	
+	public static String[] getTables(Connection conn) throws SQLException {
+		DatabaseMetaData md = conn.getMetaData();
+		ResultSet rs = md.getTables(null, null, "%", null);
+		
+		//Get the number of tables
+		int rowCount = sizeOfResultSet(rs);
+		
+		//Create the array
+		String[] tables = new String[rowCount];
+		
+		//Add to the array
+		int i = 0;
+		while (rs.next())
+		  tables[i++] = rs.getString(3);
+		
+		return tables;
+	}
+	
+	private static int sizeOfResultSet(ResultSet rs) throws SQLException {
+		int rowCount = 0;
+		if (rs.last()) {
+			  rowCount = rs.getRow();
+			  rs.beforeFirst(); // not rs.first() because using rs.next() later will move over the first element
+		}
+		return rowCount;
+	}
+		
 //	/**
 //	 * Code Snippet to get the names of all the tables in the requested database
 //	 */
