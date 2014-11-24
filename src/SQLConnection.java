@@ -3,14 +3,14 @@ import java.util.Properties;
 
 
 /**
- * app.java
+ * SQLConnection.java
  * @author Stanford Lockhart
  * B00646015
  * Nov 4, 2014
  * Dalhousie University
  * Faculty of Computer Science
  */
-public class app {
+public class SQLConnection {
 
 	public static void main(String[] args) throws ClassNotFoundException, SQLException {
 
