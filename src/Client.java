@@ -3,7 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
 public class Client extends JFrame implements ActionListener{
-	private JPanel panel;
+	private JPanel selectP, fromP, whereP;
 	private ArrayList<JComboBox> select;
 	private ArrayList<JComboBox> from;
 	private JButton run;
@@ -17,24 +17,56 @@ public class Client extends JFrame implements ActionListener{
 	private JButton wherePlus;
 	private JButton whereMinus;
 	
+	public static void main(String[] args) {
+		Client a = new Client();
+	}
 	
 	public Client() {
-		panel= new JPanel();
-		select= new ArrayList<JComboBox>();
-		from= new ArrayList<JComboBox>();
-		run= new JButton("Run query");
+		selectP = new JPanel(new FlowLayout());
+		fromP = new JPanel(new FlowLayout());
+		whereP = new JPanel(new FlowLayout());
+		
 		SELECT= new JLabel("SELECT");
-		FROM= new JLabel("FROM");
-		WHERE= new JCheckBox("WHERE");
+		select= new ArrayList<JComboBox>();
 		selectPlus= new JButton("+");
 		selectMinus= new JButton("-");
+		selectP.add(SELECT);
+//		selectP.add(/*Combo Boxes*/);
+		selectP.add(selectPlus);
+		selectP.add(selectMinus);
+		
+		FROM= new JLabel("FROM");
+		from= new ArrayList<JComboBox>();
 		fromPlus= new JButton("+");
 		fromMinus= new JButton("-");
+		fromP.add(FROM);
+//		fromP.add(/*Combo Boxes*/);
+		fromP.add(fromPlus);
+		fromP.add(fromMinus);
+		
+		WHERE= new JCheckBox("WHERE");
 		wherePlus= new JButton("+");
 		whereMinus= new JButton("-");
+		whereP.add(WHERE);
+//		whereP.add(/*Text Boxes*/);
+		whereP.add(wherePlus);
+		whereP.add(whereMinus);
+		
+		run= new JButton("Run Query");
 		
 		//add elements into frame
+		setLayout(new GridLayout(4, 1));
+		add(selectP);
+		add(fromP);
+		add(whereP);
+		add(run);
 		
+		//Set window properties
+		setTitle("SQL");
+		setSize(400,400);
+		setLocation(200,100);
+		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setVisible(true);
 	}
 	
 	public void actionPerformed(ActionEvent e) {
