@@ -106,11 +106,14 @@ public class SQLConnection {
 			int columnCount = rsmd.getColumnCount();
 
 			//Create the array
-			String[] columns = new String[columnCount];
+			String[] columns = new String[columnCount+1];
 
+			//Add "All" option
+			columns[0] = "*";
+			
 			// The column count starts from 1
 			for (int i = 1; i < columnCount + 1; i++) {
-				columns[i - 1] = rsmd.getColumnName(i);
+				columns[i] = rsmd.getColumnName(i);
 			}
 
 			return columns;
