@@ -122,6 +122,8 @@ public class Client extends JFrame implements ActionListener{
 			else {
 				wherePlus.setEnabled(false);
 				whereMinus.setEnabled(false); 
+				
+				//loop for disabling list of other "boxes"
 			}
 		}
 		
