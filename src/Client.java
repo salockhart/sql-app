@@ -2,7 +2,19 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+
+/**
+ * Client.java
+ * @author Matt Trask
+ * B00
+ * Nov 26, 2014
+ * Dalhousie University
+ * Faculty of Computer Science
+ */
+
 public class Client extends JFrame implements ActionListener{
+	
+	//Instance variables
 	private JPanel selectP, fromP, whereP;
 	private ArrayList<JComboBox> select;
 	private ArrayList<JComboBox> from;
@@ -21,6 +33,9 @@ public class Client extends JFrame implements ActionListener{
 		Client a = new Client();
 	}
 	
+	/**
+	 * Create the window, with labels and buttons
+	 */
 	public Client() {
 		selectP = new JPanel(new FlowLayout());
 		fromP = new JPanel(new FlowLayout());
@@ -69,6 +84,9 @@ public class Client extends JFrame implements ActionListener{
 		setVisible(true);
 	}
 	
+	/**
+	 * Retrieve actions that occur in the window and make actions happen
+	 */
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource()== WHERE) {
 			//code to make rest of where query visible;
