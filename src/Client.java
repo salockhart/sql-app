@@ -58,9 +58,11 @@ public class Client extends JFrame implements ActionListener{
 		SELECT= new JLabel("SELECT");
 		selectB= new ArrayList<JComboBox>();
 		selectPlus= new JButton("+");
+		selectPlus.addActionListener(this);
 		selectMinus= new JButton("-");
+		selectMinus.addActionListener(this);
 		selectP.add(SELECT);
-		selectB.add(createBox(true));
+		selectB.add(createBoxColumns(true));
  		selectP.add(selectB.get(0));
 		selectP.add(selectPlus);
 		selectP.add(selectMinus);
@@ -68,20 +70,25 @@ public class Client extends JFrame implements ActionListener{
 		FROM= new JLabel("FROM");
 		fromB= new ArrayList<JComboBox>();
 		fromPlus= new JButton("+");
+		fromPlus.addActionListener(this);
 		fromMinus= new JButton("-");
+		fromMinus.addActionListener(this);
 		fromP.add(FROM);
-		selectB.add(createBox(true));
+		selectB.add(createBoxTables(true));
 		fromP.add(selectB.get(0));
 		fromP.add(fromPlus);
 		fromP.add(fromMinus);
 		
 		WHERE= new JCheckBox("WHERE");
+		WHERE.addActionListener(this);
 		wherePlus= new JButton("+");
 		wherePlus.setEnabled(false);
+		wherePlus.addActionListener(this);
 		whereMinus= new JButton("-");
 		whereMinus.setEnabled(false);
+		whereMinus.addActionListener(this);
 		whereP.add(WHERE);
-		whereB= createBox(false);
+		whereB= createBoxColumns(false);
 		whereP.add(whereB);
 //		whereP.add(/* elements */);
 		whereP.add(wherePlus);
@@ -124,7 +131,7 @@ public class Client extends JFrame implements ActionListener{
 		if(e.getSource()== selectPlus) {
 			selectP.remove(selectPlus);
 			selectP.remove(selectMinus);
-			selectB.add(createBox(true));
+			selectB.add(createBoxColumns(true));
 			selectP.add(selectB.get(selectB.size()-1));
 			selectP.add(selectPlus);
 			selectP.add(selectMinus);
@@ -139,7 +146,7 @@ public class Client extends JFrame implements ActionListener{
 		if(e.getSource()== fromPlus) {
 			fromP.remove(fromPlus);
 			fromP.remove(fromMinus);
-			fromB.add(createBox(true));
+			fromB.add(createBoxTables(true));
 			fromP.add(fromB.get(fromB.size()-1));
 			fromP.add(fromPlus);
 			fromP.add(fromMinus);
@@ -153,9 +160,16 @@ public class Client extends JFrame implements ActionListener{
 		
 	}
 	
-	public JComboBox createBox(boolean enable) {
+	public JComboBox createBoxTables(boolean enable) {
 		String[] tables= connection.getTables();
 		JComboBox temp= new JComboBox(tables);
+		temp.setEnabled(enable);
+		return temp;
+	}
+	
+	public JComboBox createBoxColumns(boolean enable) {
+		String[] columns= connection.getColumns();
+		JComboBox temp= new JComboBox(columns);
 		temp.setEnabled(enable);
 		return temp;
 	}
