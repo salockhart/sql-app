@@ -16,10 +16,10 @@ public class Client extends JFrame implements ActionListener{
 	
 	//Instance variables
 	private JPanel selectP, fromP, whereP;
-	private ArrayList<JComboBox> selectB;
-	private ArrayList<JComboBox> fromB;
-	private JComboBox whereB;
-	private ArrayList<JComboBox> operationsB;
+	private ArrayList<JComboBox<String>> selectB;
+	private ArrayList<JComboBox<String>> fromB;
+	private JComboBox<String> whereB;
+	private ArrayList<JComboBox<String>> operationsB;
 	private ArrayList<JTextField> inputs;
 	private JButton run;
 	private JLabel SELECT;
@@ -32,7 +32,7 @@ public class Client extends JFrame implements ActionListener{
 	private JButton wherePlus;
 	private JButton whereMinus;
 	private SQLConnection connection;
-	private static String[] operands= {"==", "<=", "<", ">=", ">", "LIKE"};
+//	private String[] operands= {"==", "<=", "<", ">=", ">", "LIKE"};
 	
 	public static void main(String[] args) {
 		String username, password;
@@ -54,8 +54,20 @@ public class Client extends JFrame implements ActionListener{
 		fromP = new JPanel(new FlowLayout());
 		whereP = new JPanel(new FlowLayout());
 		
+		FROM= new JLabel("FROM");
+		fromB= new ArrayList<JComboBox<String>>();
+		fromPlus= new JButton("+");
+		fromPlus.addActionListener(this);
+		fromMinus= new JButton("-");
+		fromMinus.addActionListener(this);
+		fromP.add(FROM);
+		fromB.add(createBoxTables(true));
+		fromP.add(fromB.get(0));
+		fromP.add(fromPlus);
+		fromP.add(fromMinus);
+		
 		SELECT= new JLabel("SELECT");
-		selectB= new ArrayList<JComboBox>();
+		selectB= new ArrayList<JComboBox<String>>();
 		selectPlus= new JButton("+");
 		selectPlus.addActionListener(this);
 		selectMinus= new JButton("-");
@@ -66,18 +78,6 @@ public class Client extends JFrame implements ActionListener{
 		selectP.add(selectPlus);
 		selectP.add(selectMinus);
 		
-		FROM= new JLabel("FROM");
-		fromB= new ArrayList<JComboBox>();
-		fromPlus= new JButton("+");
-		fromPlus.addActionListener(this);
-		fromMinus= new JButton("-");
-		fromMinus.addActionListener(this);
-		fromP.add(FROM);
-		selectB.add(createBoxTables(true));
-		fromP.add(selectB.get(0));
-		fromP.add(fromPlus);
-		fromP.add(fromMinus);
-		
 		WHERE= new JCheckBox("WHERE");
 		WHERE.addActionListener(this);
 		wherePlus= new JButton("+");
@@ -87,7 +87,7 @@ public class Client extends JFrame implements ActionListener{
 		whereMinus.setEnabled(false);
 		whereMinus.addActionListener(this);
 		whereP.add(WHERE);
-		whereB= createBoxColumns(false);
+		whereB = createBoxColumns(false);
 		whereP.add(whereB);
 		operationsB.add(createOperations(false));
 		whereP.add(operationsB.get(0));
@@ -197,22 +197,23 @@ public class Client extends JFrame implements ActionListener{
 		
 	}
 	
-	public JComboBox createBoxTables(boolean enable) {
+	public JComboBox<String> createBoxTables(boolean enable) {
 		String[] tables= connection.getTables();
-		JComboBox temp= new JComboBox(tables);
+		JComboBox<String> temp= new JComboBox<String>(tables);
 		temp.setEnabled(enable);
 		return temp;
 	}
 	
-	public JComboBox createBoxColumns(boolean enable) {
-//		String[] columns= 
-		JComboBox temp= new JComboBox(columns);
+	public JComboBox<String> createBoxColumns(boolean enable) {
+		String[] columns = calcTables();
+		JComboBox<String> temp = new JComboBox<String>(columns);
 		temp.setEnabled(enable);
 		return temp;
 	}
 	
-	public JComboBox createOperations(boolean enable) {
-		JComboBox temp= new JComboBox(operands);
+	public JComboBox<String> createOperations(boolean enable) {
+		String[] operands = {"==", "<=", "<", ">=", ">", "LIKE"};
+		JComboBox<String> temp = new JComboBox<String>(operands);
 		temp.setEnabled(enable);
 		return temp;
 	}
@@ -226,7 +227,12 @@ public class Client extends JFrame implements ActionListener{
 	public String[] calcTables() {
 		ArrayList<String> temp= new ArrayList<String>();
 		for(int i=0; i<fromB.size(); i++) {
-			temp.add(fromB.get(i).getSelectedItem())
+			temp.add((String)fromB.get(i).getSelectedItem());
 		}
+		String query = "SELECT * FROM ";
+		for (int i = 0; i < temp.size(); i++)
+			query += temp.get(i) + ", ";
+		query = query.substring(0, query.length() - 2) + ";";
+		return connection.getColumns(connection.query(query)).clone();
 	}
 }

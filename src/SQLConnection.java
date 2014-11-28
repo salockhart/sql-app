@@ -43,26 +43,25 @@ public class SQLConnection {
 	 * @param query
 	 * @throws SQLException
 	 */
-	public JTable query(String query) {
+	public ResultSet query(String query) {
 		//Query the DB
 		Statement stmt = null;
-		JTable table = null;
+		ResultSet rs = null;
 		try {
 			stmt = conn.createStatement();
-			ResultSet rs = stmt.executeQuery(query);
-			table = new JTable(buildTableModel(rs));
+			rs = stmt.executeQuery(query);
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, e, "SQL Exception", JOptionPane.ERROR_MESSAGE);
 		} finally {
-			try {
-				if (stmt != null) {
-					stmt.close();
-				}
-			} catch (SQLException e) {
-				JOptionPane.showMessageDialog(null, e, "SQL Exception", JOptionPane.ERROR_MESSAGE);
-			}
+//			try {
+//				if (stmt != null) {
+//					stmt.close();
+//				}
+//			} catch (SQLException e) {
+//				JOptionPane.showMessageDialog(null, e, "SQL Exception", JOptionPane.ERROR_MESSAGE);
+//			}
 		}
-		return table;
+		return rs;
 	}
 	
 	/**
@@ -121,6 +120,21 @@ public class SQLConnection {
 			JOptionPane.showMessageDialog(null, e, "SQL Exception", JOptionPane.ERROR_MESSAGE);
 			return null;
 		}
+	}
+	
+	/**
+	 * Return a JTable representation of a ResultSet
+	 * @param rs
+	 * @return
+	 */
+	public JTable getTable(ResultSet rs) {
+		JTable table = null;
+		try {
+			table = new JTable(buildTableModel(rs));
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, e, "SQL Exception", JOptionPane.ERROR_MESSAGE);
+		}
+		return table;
 	}
 	
 	/**
