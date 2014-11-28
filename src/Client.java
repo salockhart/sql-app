@@ -33,12 +33,9 @@ public class Client extends JFrame implements ActionListener{
 	private SQLConnection connection;
 	
 	public static void main(String[] args) {
-		Scanner keyboard= new Scanner(System.in);
 		String username, password;
-		System.out.print("Username: ");
-		username= keyboard.next();
-		System.out.print("Password: ");
-		password= keyboard.next();
+		username = JOptionPane.showInputDialog("Username: ");
+		password = JOptionPane.showInputDialog("Password: ");
 		
 		Client a = new Client(username, password);
 	}
@@ -48,7 +45,7 @@ public class Client extends JFrame implements ActionListener{
 	 */
 	public Client(String username, String password) {
 		//initiate connection to database
-		connection= new SQLConnection(username, password);
+		connection = new SQLConnection(username, password);
 		
 		
 		selectP = new JPanel(new FlowLayout());
