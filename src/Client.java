@@ -1,7 +1,9 @@
 import javax.swing.*;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 
 /**
  * Client.java
@@ -10,6 +12,23 @@ import java.util.ArrayList;
  * Nov 26, 2014
  * Dalhousie University
  * Faculty of Computer Science
+ */
+
+/**
+ * Client.java
+ * @author Stanford Lockhart
+ * B00646015
+ * Nov 28, 2014
+ * Dalhousie University
+ * Faculty of Computer Science
+ */
+
+/*
+ * AND OR NOT in another combobox
+ * NULL handling
+ * Make sure WHERE combo is enabled
+ * Changing combo query should change available columns above
+ * Change the size of the box
  */
 
 public class Client extends JFrame implements ActionListener{
@@ -89,8 +108,10 @@ public class Client extends JFrame implements ActionListener{
 		whereP.add(WHERE);
 		whereB = createBoxColumns(false);
 		whereP.add(whereB);
+		operationsB = new ArrayList<JComboBox<String>>();
 		operationsB.add(createOperations(false));
 		whereP.add(operationsB.get(0));
+		inputs = new ArrayList<JTextField>();
 		inputs.add(new JTextField());
 		whereP.add(inputs.get(0));
 		whereP.add(wherePlus);
@@ -190,11 +211,11 @@ public class Client extends JFrame implements ActionListener{
 		if(e.getSource()== whereMinus) {
 			//only check operations because operations and inputs grow/shrink together
 			if(operationsB.size()>1) {
-				fromP.remove(operationsB.remove(operationsB.size()-1));
-				fromP.remove(inputs.remove(inputs.size()-1));
+				whereP.remove(operationsB.remove(operationsB.size()-1));
+				whereP.remove(inputs.remove(inputs.size()-1));
 			}
 		}
-		
+		validate();
 	}
 	
 	public JComboBox<String> createBoxTables(boolean enable) {
@@ -229,6 +250,11 @@ public class Client extends JFrame implements ActionListener{
 		for(int i=0; i<fromB.size(); i++) {
 			temp.add((String)fromB.get(i).getSelectedItem());
 		}
+		//Remove duplicate tables
+		HashSet<String> hs = new HashSet<String>();
+		hs.addAll(temp);
+		temp.clear();
+		temp.addAll(hs);
 		String query = "SELECT * FROM ";
 		for (int i = 0; i < temp.size(); i++)
 			query += temp.get(i) + ", ";
