@@ -24,8 +24,7 @@ import java.util.HashSet;
  */
 
 /*
- * NULL handling
- * Change the size of the box
+ * Implement the run query button
  */
 
 public class Client extends JFrame implements ActionListener{
