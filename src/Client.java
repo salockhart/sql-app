@@ -126,7 +126,7 @@ public class Client extends JFrame implements ActionListener{
 		
 		//Set window properties
 		setTitle("SQL");
-		setSize(400,400);
+		setSize(600,400);
 		setLocation(200,100);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
@@ -237,7 +237,7 @@ public class Client extends JFrame implements ActionListener{
 		for(int i=0; i< fromB.size(); i++) {
 			if(e.getSource()==fromB.get(i)) {
 				for(int j=0; j< selectB.size(); j++) {
-					selectB.get(j).removeAll();
+					selectB.get(j).removeAllItems();
 					String[] columns= calcTables();
 					for(int k=0; k< columns.length; k++) {
 						selectB.get(j).addItem(columns[k]);
@@ -245,7 +245,7 @@ public class Client extends JFrame implements ActionListener{
 				}
 				
 				for(int j=0; j<whereB.size(); j++) {
-					whereB.get(j).removeAll();
+					whereB.get(j).removeAllItems();
 					String[] columns= calcTables();
 					for(int k=0; k<columns.length; k++) {
 						whereB.get(j).addItem(columns[k]);
@@ -260,6 +260,7 @@ public class Client extends JFrame implements ActionListener{
 	public JComboBox<String> createBoxTables(boolean enable) {
 		String[] tables= connection.getTables();
 		JComboBox<String> temp= new JComboBox<String>(tables);
+		temp.addActionListener(this);
 		temp.setEnabled(enable);
 		return temp;
 	}
