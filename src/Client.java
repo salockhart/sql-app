@@ -125,7 +125,7 @@ public class Client extends JFrame implements ActionListener{
 		add(run);
 		
 		//Set window properties
-		setTitle("SQL");
+		setTitle(username);
 		setSize(600,400);
 		setLocation(200,100);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
