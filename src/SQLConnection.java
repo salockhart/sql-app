@@ -4,6 +4,8 @@ import java.util.*;
 import javax.swing.*;
 import javax.swing.table.*;
 
+import org.jdesktop.swingx.JXTable;
+
 /**
  * SQLConnection.java
  * @author Stanford Lockhart
@@ -123,14 +125,40 @@ public class SQLConnection {
 	}
 	
 	/**
+	 * Get the names of all the columns in a given table minus * for all
+	 * @param table
+	 * @return
+	 * @throws SQLException 
+	 */
+	public String[] getColumnsMinusAll(ResultSet rs) {
+		try {
+			ResultSetMetaData rsmd = rs.getMetaData();
+			int columnCount = rsmd.getColumnCount();
+
+			//Create the array
+			String[] columns = new String[columnCount];
+			
+			// The column count starts from 1
+			for (int i = 1; i < columnCount + 1; i++) {
+				columns[i-1] = rsmd.getColumnName(i);
+			}
+
+			return columns;
+		} catch (SQLException e) {
+			JOptionPane.showMessageDialog(null, e, "SQL Exception", JOptionPane.ERROR_MESSAGE);
+			return null;
+		}
+	}
+	
+	/**
 	 * Return a JTable representation of a ResultSet
 	 * @param rs
 	 * @return
 	 */
-	public JTable getTable(ResultSet rs) {
-		JTable table = null;
+	public JXTable getTable(ResultSet rs) {
+		JXTable table = null;
 		try {
-			table = new JTable(buildTableModel(rs));
+			table = new JXTable(buildTableModel(rs));
 		} catch (SQLException e) {
 			JOptionPane.showMessageDialog(null, e, "SQL Exception", JOptionPane.ERROR_MESSAGE);
 		}
@@ -182,14 +210,17 @@ public class SQLConnection {
 	 * @throws SQLException
 	 */
 	private DefaultTableModel buildTableModel(ResultSet rs) throws SQLException {
+		
+		Vector<Vector<Object>> data = new Vector<Vector<Object>>();
+		
 		//Get column names
-		Vector<String> columns = new Vector<String>();
-		String[] columnNames = getColumns(rs);
+		Vector<Object> columns = new Vector<Object>();
+		String[] columnNames = getColumnsMinusAll(rs);
 		for (String s : columnNames)
 			columns.add(s);
+		data.add(columns);
 		
 		//Get table data
-		Vector<Vector<Object>> data = new Vector<Vector<Object>>();
 		int columnCount = rs.getMetaData().getColumnCount();
 		while (rs.next()) {
 			Vector<Object> vector = new Vector<Object>();

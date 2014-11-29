@@ -1,5 +1,7 @@
 import javax.swing.*;
 
+import org.jdesktop.swingx.JXTable;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -115,6 +117,7 @@ public class Client extends JFrame implements ActionListener{
 		whereP.add(whereMinus);
 		
 		run= new JButton("Run Query");
+		run.addActionListener(this);
 		
 		//add elements into frame
 		setLayout(new GridLayout(4, 1));
@@ -249,7 +252,7 @@ public class Client extends JFrame implements ActionListener{
 			selectstr="SELECT ";
 			
 			//select element of query
-			for(int i=0;i<selectB.size()-1;i++){
+			for(int i=0;i<selectB.size();i++){
 				if(i!=selectB.size()-1){
 					selectstr+=selectB.get(i).getSelectedItem()+", ";
 				}
@@ -259,7 +262,7 @@ public class Client extends JFrame implements ActionListener{
 			}
 			
 			//from element of query
-			for(int i=0;i<fromB.size()-1;i++){
+			for(int i=0;i<fromB.size();i++){
 				if(i!=fromB.size()-1){
 					fromstr+=fromB.get(i).getSelectedItem()+", ";
 				}
@@ -273,33 +276,44 @@ public class Client extends JFrame implements ActionListener{
 				wherestr="WHERE ";
 				wherestr+=whereB.get(0).getSelectedItem() + " ";
 				wherestr+=operationsB.get(0).getSelectedItem() + " ";
-				wherestr+=inputs.get(0).getSelectedText() + " ";
+				wherestr+=inputs.get(0).getText() + " ";
 				int tableC=1;
 				int relC=1;
 				int opC=1;
-				while((tableC<whereB.size()-1)&&(relC<inputs.size()-1)&&(opC<operationsB.size()-1)){
+				while((tableC<whereB.size())&&(relC<inputs.size())&&(opC<operationsB.size())){
 					wherestr+=operationsB.get(opC).getSelectedItem()+ " ";
 					opC++;
 					wherestr+=whereB.get(tableC).getSelectedItem() + " ";
 					tableC++;
 					wherestr+=operationsB.get(opC).getSelectedItem() + " ";
 					opC++;
-					wherestr+=inputs.get(relC).getSelectedText() + " ";
+					wherestr+=inputs.get(relC).getText() + " ";
 					relC++;
 				}
 			}
 			
-			String query=selectstr+fromstr+wherestr+ ";";
+			String query=selectstr+fromstr+wherestr;
+			query = query.substring(0, query.length()-1);
+			query+=";";
 			
-			JTable result=connection.getTable(connection.query(query));
+			JXTable result=connection.getTable(connection.query(query));
+			result.setEnabled(false);
+ 			result.packAll();
+ 			result.setPreferredScrollableViewportSize(result.getPreferredSize());
+			
+			JPanel tableP = new JPanel();
+			tableP.add(result);
+			JScrollPane tableS = new JScrollPane(tableP);
 			
 			JFrame frame= new JFrame("Results");
 			JLabel QueryL= new JLabel(query);
-			frame.add(QueryL);
-			frame.add(result);
-			frame.setSize(400, 400);
+			JPanel queryP = new JPanel();
+			queryP.add(QueryL);
+			frame.add(queryP, BorderLayout.PAGE_START);
+			frame.add(tableS, BorderLayout.CENTER);
+			frame.setSize(600, 400);
 			frame.setLocation(250, 150);
-			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			frame.setVisible(true);
 			
 			
@@ -327,7 +341,7 @@ public class Client extends JFrame implements ActionListener{
 	
 	//creates specific comboBox holding all boolean operations
 	public JComboBox<String> createOperations(boolean enable) {
-		String[] operands = {"==", "<=", "<", ">=", ">", "LIKE", "AND", "OR"};
+		String[] operands = {"=", "<=", "<", ">=", ">", "LIKE", "AND", "OR"};
 		JComboBox<String> temp = new JComboBox<String>(operands);
 		temp.setEnabled(enable);
 		return temp;
