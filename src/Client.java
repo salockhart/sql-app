@@ -231,27 +231,21 @@ public class Client extends JFrame implements ActionListener{
 			if(whereB.size()>1) {
 				whereP.remove(whereB.remove(whereB.size()-1));
 			}
+			
+			updateBoxes(selectB);
+			updateBoxes(whereB);
 		}
 		
 		//when entries in FROM change change select Jcombobox values and where Jcombobox 
 		for(int i=0; i< fromB.size(); i++) {
 			if(e.getSource()==fromB.get(i)) {
-				for(int j=0; j< selectB.size(); j++) {
-					selectB.get(j).removeAllItems();
-					String[] columns= calcTables();
-					for(int k=0; k< columns.length; k++) {
-						selectB.get(j).addItem(columns[k]);
-					}
-				}
-				
-				for(int j=0; j<whereB.size(); j++) {
-					whereB.get(j).removeAllItems();
-					String[] columns= calcTables();
-					for(int k=0; k<columns.length; k++) {
-						whereB.get(j).addItem(columns[k]);
-					}
-				}
+				updateBoxes(selectB);
+				updateBoxes(whereB);
 			}
+		}
+		
+		if(e.getSource()== run) {
+			//run query
 		}
 		validate();
 	}
@@ -285,6 +279,7 @@ public class Client extends JFrame implements ActionListener{
 	public JTextField createField(boolean enable) {
 		JTextField temp= new JTextField();
 		temp.setEnabled(enable);
+		temp.setSize(40, 12);
 		return temp;
 	}
 	
@@ -304,5 +299,15 @@ public class Client extends JFrame implements ActionListener{
 			query += temp.get(i) + ", ";	//adds element to query
 		query = query.substring(0, query.length() - 2) + ";";	//chops off last character ','
 		return connection.getColumns(connection.query(query)).clone();
+	}
+	
+	public void updateBoxes(ArrayList<JComboBox<String>> boxes) {
+		for(int j=0; j<boxes.size(); j++) {
+			boxes.get(j).removeAllItems();
+			String[] columns= calcTables();
+			for(int k=0; k<columns.length; k++) {
+				boxes.get(j).addItem(columns[k]);
+			}
+		}
 	}
 }
