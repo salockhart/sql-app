@@ -35,7 +35,8 @@ public class Client extends JFrame implements ActionListener{
 	private JPanel selectP, fromP, whereP;
 	private ArrayList<JComboBox<String>> selectB;
 	private ArrayList<JComboBox<String>> fromB;
-	private JComboBox<String> whereB;
+	private ArrayList<JComboBox<String>> whereB;
+//	private JComboBox<String> whereB;
 	private ArrayList<JComboBox<String>> operationsB;
 	private ArrayList<JTextField> inputs;
 	private JButton run;
@@ -65,13 +66,18 @@ public class Client extends JFrame implements ActionListener{
 		//initiate connection to database
 		connection = new SQLConnection(username, password);
 		
-		
+		//creates all arrayLists
+		fromB= new ArrayList<JComboBox<String>>();
+		selectB= new ArrayList<JComboBox<String>>();
+		whereB= new ArrayList<JComboBox<String>>();
+		operationsB = new ArrayList<JComboBox<String>>();
+		inputs = new ArrayList<JTextField>();
+				
 		selectP = new JPanel(new FlowLayout());
 		fromP = new JPanel(new FlowLayout());
 		whereP = new JPanel(new FlowLayout());
 		
 		FROM= new JLabel("FROM");
-		fromB= new ArrayList<JComboBox<String>>();
 		fromPlus= new JButton("+");
 		fromPlus.addActionListener(this);
 		fromMinus= new JButton("-");
@@ -83,7 +89,6 @@ public class Client extends JFrame implements ActionListener{
 		fromP.add(fromMinus);
 		
 		SELECT= new JLabel("SELECT");
-		selectB= new ArrayList<JComboBox<String>>();
 		selectPlus= new JButton("+");
 		selectPlus.addActionListener(this);
 		selectMinus= new JButton("-");
@@ -103,12 +108,10 @@ public class Client extends JFrame implements ActionListener{
 		whereMinus.setEnabled(false);
 		whereMinus.addActionListener(this);
 		whereP.add(WHERE);
-		whereB = createBoxColumns(false);
-		whereP.add(whereB);
-		operationsB = new ArrayList<JComboBox<String>>();
+		whereB.add(createBoxColumns(false));
+		whereP.add(whereB.get(0));
 		operationsB.add(createOperations(false));
 		whereP.add(operationsB.get(0));
-		inputs = new ArrayList<JTextField>();
 		inputs.add(new JTextField());
 		whereP.add(inputs.get(0));
 		whereP.add(wherePlus);
@@ -139,7 +142,10 @@ public class Client extends JFrame implements ActionListener{
 			if(WHERE.isSelected()) {
 				wherePlus.setEnabled(true);
 				whereMinus.setEnabled(true);
-				whereB.setEnabled(true);
+				
+				for(int i=0; i<whereB.size(); i++) {
+					whereB.get(i).setEnabled(true);
+				}
 				
 				for(int i=0; i<operationsB.size(); i++) {
 					operationsB.get(i).setEnabled(true);
@@ -152,7 +158,10 @@ public class Client extends JFrame implements ActionListener{
 			else {
 				wherePlus.setEnabled(false);
 				whereMinus.setEnabled(false);
-				whereB.setEnabled(false);
+				
+				for(int i=0; i<whereB.size(); i++) {
+					whereB.get(i).setEnabled(false);
+				}
 				
 				for(int i=0; i<operationsB.size(); i++) {
 					operationsB.get(i).setEnabled(false);
@@ -201,6 +210,10 @@ public class Client extends JFrame implements ActionListener{
 			whereP.remove(whereMinus);
 			operationsB.add(createOperations(on));
 			whereP.add(operationsB.get(operationsB.size()-1));
+			whereB.add(createBoxColumns(on));
+			whereP.add(whereB.get(whereB.size()-1));
+			operationsB.add(createOperations(on));
+			whereP.add(operationsB.get(operationsB.size()-1));
 			inputs.add(createField(on));
 			whereP.add(inputs.get(inputs.size()-1));
 			whereP.add(wherePlus);
@@ -208,13 +221,21 @@ public class Client extends JFrame implements ActionListener{
 		}
 		
 		if(e.getSource()== whereMinus) {
-			//only check operations because operations and inputs grow/shrink together
 			if(operationsB.size()>1) {
 				whereP.remove(operationsB.remove(operationsB.size()-1));
+				whereP.remove(operationsB.remove(operationsB.size()-1));
+			}
+			
+			if(inputs.size()>1) {
 				whereP.remove(inputs.remove(inputs.size()-1));
+			}
+			
+			if(whereB.size()>1) {
+				whereP.remove(whereB.remove(whereB.size()-1));
 			}
 		}
 		
+		//when entries in FROM change change select combobox values and where combobox 
 		for(int i=0; i< fromB.size(); i++) {
 			if(e.getSource()==fromB.get(i)) {
 				for(int j=0; j< selectB.size(); j++) {
@@ -224,6 +245,8 @@ public class Client extends JFrame implements ActionListener{
 						selectB.get(j).addItem(columns[k]);
 					}
 				}
+				
+				//where combo boxes
 			}
 		}
 		validate();
