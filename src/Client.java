@@ -25,7 +25,6 @@ import java.util.HashSet;
 
 /*
  * NULL handling
- * Changing combo query should change available columns above
  * Change the size of the box
  */
 
@@ -36,7 +35,6 @@ public class Client extends JFrame implements ActionListener{
 	private ArrayList<JComboBox<String>> selectB;
 	private ArrayList<JComboBox<String>> fromB;
 	private ArrayList<JComboBox<String>> whereB;
-//	private JComboBox<String> whereB;
 	private ArrayList<JComboBox<String>> operationsB;
 	private ArrayList<JTextField> inputs;
 	private JButton run;
@@ -235,7 +233,7 @@ public class Client extends JFrame implements ActionListener{
 			}
 		}
 		
-		//when entries in FROM change change select combobox values and where combobox 
+		//when entries in FROM change change select Jcombobox values and where Jcombobox 
 		for(int i=0; i< fromB.size(); i++) {
 			if(e.getSource()==fromB.get(i)) {
 				for(int j=0; j< selectB.size(); j++) {
@@ -246,7 +244,13 @@ public class Client extends JFrame implements ActionListener{
 					}
 				}
 				
-				//where combo boxes
+				for(int j=0; j<whereB.size(); j++) {
+					whereB.get(j).removeAll();
+					String[] columns= calcTables();
+					for(int k=0; k<columns.length; k++) {
+						whereB.get(j).addItem(columns[k]);
+					}
+				}
 			}
 		}
 		validate();
