@@ -243,7 +243,67 @@ public class Client extends JFrame implements ActionListener{
 		}
 		
 		if(e.getSource()== run) {
-			//run query
+			String fromstr,wherestr,selectstr;
+			fromstr="FROM ";
+			wherestr="";
+			selectstr="SELECT ";
+			
+			//select element of query
+			for(int i=0;i<selectB.size()-1;i++){
+				if(i!=selectB.size()-1){
+					selectstr+=selectB.get(i).getSelectedItem()+", ";
+				}
+				else{
+					selectstr+=selectB.get(i).getSelectedItem()+ " ";
+				}
+			}
+			
+			//from element of query
+			for(int i=0;i<fromB.size()-1;i++){
+				if(i!=fromB.size()-1){
+					fromstr+=fromB.get(i).getSelectedItem()+", ";
+				}
+				else{
+					fromstr+=fromB.get(i).getSelectedItem() + " ";
+				}
+			}
+			
+			//where element of query
+			if(WHERE.isSelected()){
+				wherestr="WHERE ";
+				wherestr+=whereB.get(0).getSelectedItem() + " ";
+				wherestr+=operationsB.get(0).getSelectedItem() + " ";
+				wherestr+=inputs.get(0).getSelectedText() + " ";
+				int tableC=1;
+				int relC=1;
+				int opC=1;
+				while((tableC<whereB.size()-1)&&(relC<inputs.size()-1)&&(opC<operationsB.size()-1)){
+					wherestr+=operationsB.get(opC).getSelectedItem()+ " ";
+					opC++;
+					wherestr+=whereB.get(tableC).getSelectedItem() + " ";
+					tableC++;
+					wherestr+=operationsB.get(opC).getSelectedItem() + " ";
+					opC++;
+					wherestr+=inputs.get(relC).getSelectedText() + " ";
+					relC++;
+				}
+			}
+			
+			String query=selectstr+fromstr+wherestr+ ";";
+			
+			JTable result=connection.getTable(connection.query(query));
+			
+			JFrame frame= new JFrame("Results");
+			JLabel QueryL= new JLabel(query);
+			frame.add(QueryL);
+			frame.add(result);
+			frame.setSize(400, 400);
+			frame.setLocation(250, 150);
+			frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+			frame.setVisible(true);
+			
+			
+			
 		}
 		validate();
 	}
