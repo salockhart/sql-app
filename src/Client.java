@@ -24,9 +24,7 @@ import java.util.HashSet;
  */
 
 /*
- * AND OR NOT in another combobox
  * NULL handling
- * Make sure WHERE combo is enabled
  * Changing combo query should change available columns above
  * Change the size of the box
  */
@@ -51,7 +49,6 @@ public class Client extends JFrame implements ActionListener{
 	private JButton wherePlus;
 	private JButton whereMinus;
 	private SQLConnection connection;
-//	private String[] operands= {"==", "<=", "<", ">=", ">", "LIKE"};
 	
 	public static void main(String[] args) {
 		String username, password;
@@ -142,6 +139,7 @@ public class Client extends JFrame implements ActionListener{
 			if(WHERE.isSelected()) {
 				wherePlus.setEnabled(true);
 				whereMinus.setEnabled(true);
+				whereB.setEnabled(true);
 				
 				for(int i=0; i<operationsB.size(); i++) {
 					operationsB.get(i).setEnabled(true);
@@ -153,7 +151,8 @@ public class Client extends JFrame implements ActionListener{
 			}
 			else {
 				wherePlus.setEnabled(false);
-				whereMinus.setEnabled(false); 
+				whereMinus.setEnabled(false);
+				whereB.setEnabled(false);
 				
 				for(int i=0; i<operationsB.size(); i++) {
 					operationsB.get(i).setEnabled(false);
@@ -215,6 +214,18 @@ public class Client extends JFrame implements ActionListener{
 				whereP.remove(inputs.remove(inputs.size()-1));
 			}
 		}
+		
+		for(int i=0; i< fromB.size(); i++) {
+			if(e.getSource()==fromB.get(i)) {
+				for(int j=0; j< selectB.size(); j++) {
+					selectB.get(j).removeAll();
+					String[] columns= calcTables();
+					for(int k=0; k< columns.length; k++) {
+						selectB.get(j).addItem(columns[k]);
+					}
+				}
+			}
+		}
 		validate();
 	}
 	
@@ -236,7 +247,7 @@ public class Client extends JFrame implements ActionListener{
 	
 	//creates specific comboBox holding all boolean operations
 	public JComboBox<String> createOperations(boolean enable) {
-		String[] operands = {"==", "<=", "<", ">=", ">", "LIKE"};
+		String[] operands = {"==", "<=", "<", ">=", ">", "LIKE", "AND", "OR"};
 		JComboBox<String> temp = new JComboBox<String>(operands);
 		temp.setEnabled(enable);
 		return temp;
