@@ -24,8 +24,7 @@ import java.util.HashSet;
  */
 
 /*
- * NULL handling
- * Change the size of the box
+ * Implement the run query button
  */
 
 public class Client extends JFrame implements ActionListener{
@@ -125,7 +124,7 @@ public class Client extends JFrame implements ActionListener{
 		add(run);
 		
 		//Set window properties
-		setTitle("SQL");
+		setTitle(username);
 		setSize(600,400);
 		setLocation(200,100);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
