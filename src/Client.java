@@ -218,6 +218,7 @@ public class Client extends JFrame implements ActionListener{
 		validate();
 	}
 	
+	//creates comboBox for FROM
 	public JComboBox<String> createBoxTables(boolean enable) {
 		String[] tables= connection.getTables();
 		JComboBox<String> temp= new JComboBox<String>(tables);
@@ -225,6 +226,7 @@ public class Client extends JFrame implements ActionListener{
 		return temp;
 	}
 	
+	//creates comboBox for SELECT WHERE
 	public JComboBox<String> createBoxColumns(boolean enable) {
 		String[] columns = calcTables();
 		JComboBox<String> temp = new JComboBox<String>(columns);
@@ -232,6 +234,7 @@ public class Client extends JFrame implements ActionListener{
 		return temp;
 	}
 	
+	//creates specific comboBox holding all boolean operations
 	public JComboBox<String> createOperations(boolean enable) {
 		String[] operands = {"==", "<=", "<", ">=", ">", "LIKE"};
 		JComboBox<String> temp = new JComboBox<String>(operands);
@@ -239,12 +242,14 @@ public class Client extends JFrame implements ActionListener{
 		return temp;
 	}
 	
+	//creates textFields for later use
 	public JTextField createField(boolean enable) {
 		JTextField temp= new JTextField();
 		temp.setEnabled(enable);
 		return temp;
 	}
 	
+	//helper method to take values in FROM fields to create columns
 	public String[] calcTables() {
 		ArrayList<String> temp= new ArrayList<String>();
 		for(int i=0; i<fromB.size(); i++) {
@@ -257,8 +262,8 @@ public class Client extends JFrame implements ActionListener{
 		temp.addAll(hs);
 		String query = "SELECT * FROM ";
 		for (int i = 0; i < temp.size(); i++)
-			query += temp.get(i) + ", ";
-		query = query.substring(0, query.length() - 2) + ";";
+			query += temp.get(i) + ", ";	//adds element to query
+		query = query.substring(0, query.length() - 2) + ";";	//chops off last character ','
 		return connection.getColumns(connection.query(query)).clone();
 	}
 }
