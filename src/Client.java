@@ -109,7 +109,7 @@ public class Client extends JFrame implements ActionListener{
 		whereP.add(whereB.get(0));
 		operationsB.add(createOperations(false));
 		whereP.add(operationsB.get(0));
-		inputs.add(new JTextField());
+		inputs.add(createField(false));
 		whereP.add(inputs.get(0));
 		whereP.add(wherePlus);
 		whereP.add(whereMinus);
@@ -125,7 +125,7 @@ public class Client extends JFrame implements ActionListener{
 		
 		//Set window properties
 		setTitle(username);
-		setSize(600,400);
+		setSize(1200,800);
 		setLocation(200,100);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setVisible(true);
@@ -198,6 +198,8 @@ public class Client extends JFrame implements ActionListener{
 			if(fromB.size()>1) {
 				fromP.remove(fromB.remove(fromB.size()-1));
 			}
+			updateBoxes(selectB);
+			updateBoxes(whereB);
 		}
 		
 		if(e.getSource()== wherePlus) {
@@ -230,9 +232,6 @@ public class Client extends JFrame implements ActionListener{
 			if(whereB.size()>1) {
 				whereP.remove(whereB.remove(whereB.size()-1));
 			}
-			
-			updateBoxes(selectB);
-			updateBoxes(whereB);
 		}
 		
 		//when entries in FROM change change select Jcombobox values and where Jcombobox 
@@ -278,7 +277,7 @@ public class Client extends JFrame implements ActionListener{
 	public JTextField createField(boolean enable) {
 		JTextField temp= new JTextField();
 		temp.setEnabled(enable);
-		temp.setSize(40, 12);
+		temp.setPreferredSize(new Dimension(100, 20));
 		return temp;
 	}
 	
