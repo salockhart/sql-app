@@ -32,22 +32,27 @@ import java.util.HashSet;
 public class Client extends JFrame implements ActionListener{
 	
 	//Instance variables
-	private JPanel selectP, fromP, whereP;
+	private JPanel selectP, fromP, whereP, orderP;
 	private ArrayList<JComboBox<String>> selectB;
 	private ArrayList<JComboBox<String>> fromB;
 	private ArrayList<JComboBox<String>> whereB;
 	private ArrayList<JComboBox<String>> operationsB;
 	private ArrayList<JComboBox<String>> inputs;
+	private ArrayList<JComboBox<String>> orderB;
+	private JComboBox<String> orderBTypes;
 	private JButton run;
 	private JLabel SELECT;
 	private JLabel FROM;
-	private JCheckBox WHERE; 
+	private JCheckBox WHERE;
+	private JCheckBox ORDER;
 	private JButton selectPlus;
 	private JButton selectMinus;
 	private JButton fromPlus;
 	private JButton fromMinus;
 	private JButton wherePlus;
 	private JButton whereMinus;
+	private JButton orderPlus;
+	private JButton orderMinus;
 	private SQLConnection connection;
 	
 	public static void main(String[] args) {
@@ -69,12 +74,16 @@ public class Client extends JFrame implements ActionListener{
 		fromB= new ArrayList<JComboBox<String>>();
 		selectB= new ArrayList<JComboBox<String>>();
 		whereB= new ArrayList<JComboBox<String>>();
+		orderB = new ArrayList<JComboBox<String>>();
+		String[] types = {"ASC", "DESC"};
+		orderBTypes = new JComboBox<String>(types);
 		operationsB = new ArrayList<JComboBox<String>>();
 		inputs = new ArrayList<JComboBox<String>>();
 				
 		selectP = new JPanel(new FlowLayout());
 		fromP = new JPanel(new FlowLayout());
 		whereP = new JPanel(new FlowLayout());
+		orderP = new JPanel(new FlowLayout());
 		
 		FROM= new JLabel("FROM");
 		fromPlus= new JButton("+");
@@ -117,14 +126,31 @@ public class Client extends JFrame implements ActionListener{
 		whereP.add(wherePlus);
 		whereP.add(whereMinus);
 		
+		ORDER = new JCheckBox("ORDER BY");
+		ORDER.addActionListener(this);
+		orderPlus = new JButton("+");
+		orderPlus.setEnabled(false);
+		orderPlus.addActionListener(this);
+		orderMinus = new JButton("-");
+		orderMinus.setEnabled(false);
+		orderMinus.addActionListener(this);
+		orderP.add(ORDER);
+		orderB.add(createBoxColumns(false));
+		orderP.add(orderB.get(0));
+		orderP.add(orderPlus);
+		orderP.add(orderMinus);
+		orderBTypes.setEnabled(false);
+		orderP.add(orderBTypes);
+		
 		run= new JButton("Run Query");
 		run.addActionListener(this);
 		
 		//add elements into frame
-		setLayout(new GridLayout(4, 1));
+		setLayout(new GridLayout(5, 1));
 		add(selectP);
 		add(fromP);
 		add(whereP);
+		add(orderP);
 		add(run);
 		
 		//Set window properties
@@ -174,6 +200,27 @@ public class Client extends JFrame implements ActionListener{
 			}
 		}
 		
+		if(e.getSource()== ORDER) {
+			if(ORDER.isSelected()) {
+				orderPlus.setEnabled(true);
+				orderMinus.setEnabled(true);
+				orderBTypes.setEnabled(true);
+				
+				for(int i=0; i<orderB.size(); i++) {
+					orderB.get(i).setEnabled(true);
+				}
+			}
+			else {
+				orderPlus.setEnabled(false);
+				orderMinus.setEnabled(false);
+				orderBTypes.setEnabled(false);
+				
+				for(int i=0; i<orderB.size(); i++) {
+					orderB.get(i).setEnabled(false);
+				}
+			}
+		}
+		
 		if(e.getSource()== selectPlus) {
 			selectP.remove(selectPlus);
 			selectP.remove(selectMinus);
@@ -205,6 +252,7 @@ public class Client extends JFrame implements ActionListener{
 			updateBoxes(selectB);
 			updateBoxes(whereB);
 			updateBoxes(inputs);
+			updateBoxes(orderB);
 		}
 		
 		if(e.getSource()== wherePlus) {
@@ -240,20 +288,40 @@ public class Client extends JFrame implements ActionListener{
 			}
 		}
 		
+		if(e.getSource()== orderPlus) {
+			boolean on= ORDER.isSelected();
+			
+			orderP.remove(orderPlus);
+			orderP.remove(orderMinus);
+			orderP.remove(orderBTypes);
+			orderB.add(createBoxColumns(on));
+			orderP.add(orderB.get(orderB.size()-1));
+			orderP.add(orderPlus);
+			orderP.add(orderMinus);
+			orderP.add(orderBTypes);
+		}
+		
+		if(e.getSource()== orderMinus) {
+			if (orderB.size() > 1)
+				orderP.remove(orderB.remove(orderB.size()-1));
+		}
+		
 		//when entries in FROM change change select Jcombobox values and where Jcombobox 
 		for(int i=0; i< fromB.size(); i++) {
 			if(e.getSource()==fromB.get(i)) {
 				updateBoxes(selectB);
 				updateBoxes(whereB);
 				updateBoxes(inputs);
+				updateBoxes(orderB);
 			}
 		}
 		
 		if(e.getSource()== run) {
-			String fromstr,wherestr,selectstr;
+			String fromstr,wherestr,selectstr,orderstr;
 			fromstr="FROM ";
 			wherestr="";
 			selectstr="SELECT ";
+			orderstr = "";
 			
 			//select element of query
 			for(int i=0;i<selectB.size();i++){
@@ -296,7 +364,21 @@ public class Client extends JFrame implements ActionListener{
 				}
 			}
 			
-			String query=selectstr+fromstr+wherestr;
+			//order element of query
+			if (ORDER.isSelected()){
+				orderstr = "ORDER BY ";
+				for(int i=0;i<orderB.size();i++){
+					if(i!=orderB.size()-1){
+						orderstr+=orderB.get(i).getSelectedItem()+", ";
+					}
+					else{
+						orderstr+=orderB.get(i).getSelectedItem()+ " ";
+					}
+				}
+				orderstr += orderBTypes.getSelectedItem() + " ";
+			}
+			
+			String query=selectstr+fromstr+wherestr+orderstr;
 			query = query.substring(0, query.length()-1);
 			query+=";";
 			
