@@ -37,7 +37,7 @@ public class Client extends JFrame implements ActionListener{
 	private ArrayList<JComboBox<String>> fromB;
 	private ArrayList<JComboBox<String>> whereB;
 	private ArrayList<JComboBox<String>> operationsB;
-	private ArrayList<JTextField> inputs;
+	private ArrayList<JComboBox<String>> inputs;
 	private JButton run;
 	private JLabel SELECT;
 	private JLabel FROM;
@@ -70,7 +70,7 @@ public class Client extends JFrame implements ActionListener{
 		selectB= new ArrayList<JComboBox<String>>();
 		whereB= new ArrayList<JComboBox<String>>();
 		operationsB = new ArrayList<JComboBox<String>>();
-		inputs = new ArrayList<JTextField>();
+		inputs = new ArrayList<JComboBox<String>>();
 				
 		selectP = new JPanel(new FlowLayout());
 		fromP = new JPanel(new FlowLayout());
@@ -111,7 +111,8 @@ public class Client extends JFrame implements ActionListener{
 		whereP.add(whereB.get(0));
 		operationsB.add(createOperations(false));
 		whereP.add(operationsB.get(0));
-		inputs.add(createField(false));
+		inputs.add(createBoxColumns(false));
+		inputs.get(0).setEditable(true);
 		whereP.add(inputs.get(0));
 		whereP.add(wherePlus);
 		whereP.add(whereMinus);
@@ -203,6 +204,7 @@ public class Client extends JFrame implements ActionListener{
 			}
 			updateBoxes(selectB);
 			updateBoxes(whereB);
+			updateBoxes(inputs);
 		}
 		
 		if(e.getSource()== wherePlus) {
@@ -216,7 +218,8 @@ public class Client extends JFrame implements ActionListener{
 			whereP.add(whereB.get(whereB.size()-1));
 			operationsB.add(createOperations(on));
 			whereP.add(operationsB.get(operationsB.size()-1));
-			inputs.add(createField(on));
+			inputs.add(createBoxColumns(on));
+			inputs.get(inputs.size()-1).setEditable(true);
 			whereP.add(inputs.get(inputs.size()-1));
 			whereP.add(wherePlus);
 			whereP.add(whereMinus);
@@ -242,6 +245,7 @@ public class Client extends JFrame implements ActionListener{
 			if(e.getSource()==fromB.get(i)) {
 				updateBoxes(selectB);
 				updateBoxes(whereB);
+				updateBoxes(inputs);
 			}
 		}
 		
@@ -276,7 +280,7 @@ public class Client extends JFrame implements ActionListener{
 				wherestr="WHERE ";
 				wherestr+=whereB.get(0).getSelectedItem() + " ";
 				wherestr+=operationsB.get(0).getSelectedItem() + " ";
-				wherestr+=inputs.get(0).getText() + " ";
+				wherestr+=inputs.get(0).getSelectedItem() + " ";
 				int tableC=1;
 				int relC=1;
 				int opC=1;
@@ -287,7 +291,7 @@ public class Client extends JFrame implements ActionListener{
 					tableC++;
 					wherestr+=operationsB.get(opC).getSelectedItem() + " ";
 					opC++;
-					wherestr+=inputs.get(relC).getText() + " ";
+					wherestr+=inputs.get(relC).getSelectedItem() + " ";
 					relC++;
 				}
 			}
@@ -315,9 +319,6 @@ public class Client extends JFrame implements ActionListener{
 			frame.setLocation(250, 150);
 			frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 			frame.setVisible(true);
-			
-			
-			
 		}
 		validate();
 	}
@@ -357,6 +358,8 @@ public class Client extends JFrame implements ActionListener{
 	
 	//helper method to take values in FROM fields to create columns
 	public String[] calcTables() {
+		String[] result = new String[1], piece;
+		result[0] = "*";
 		ArrayList<String> temp= new ArrayList<String>();
 		for(int i=0; i<fromB.size(); i++) {
 			temp.add((String)fromB.get(i).getSelectedItem());
@@ -366,11 +369,18 @@ public class Client extends JFrame implements ActionListener{
 		hs.addAll(temp);
 		temp.clear();
 		temp.addAll(hs);
-		String query = "SELECT * FROM ";
-		for (int i = 0; i < temp.size(); i++)
-			query += temp.get(i) + ", ";	//adds element to query
-		query = query.substring(0, query.length() - 2) + ";";	//chops off last character ','
-		return connection.getColumns(connection.query(query)).clone();
+		String query;
+		for (int i = 0; i < temp.size(); i++) {
+			query = "SELECT * FROM " + temp.get(i) + ";";	//adds element to query
+			piece = connection.getColumnsMinusAll(connection.query(query)).clone();
+			for (int j = 0; j < piece.length; j++)
+				piece[j] = temp.get(i) + "." + piece[j];
+			String[] concat = new String[result.length + piece.length];
+			System.arraycopy(result, 0, concat, 0, result.length);
+			System.arraycopy(piece, 0, concat, result.length, piece.length);
+			result = concat;
+		}
+		return result;
 	}
 	
 	public void updateBoxes(ArrayList<JComboBox<String>> boxes) {
