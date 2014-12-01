@@ -36,7 +36,13 @@ public class SQLConnection {
 					+ "http://dev.mysql.com/downloads/connector/j/ and try again",
 					"ClassNotFound Exception", JOptionPane.ERROR_MESSAGE);
 		} catch (SQLException e) {
-			JOptionPane.showMessageDialog(null, e, "SQL Exception", JOptionPane.ERROR_MESSAGE);
+			if (e.toString().contains("Access denied")) {
+				JOptionPane.showMessageDialog(null, "Incorrect Username or Password", "ERROR", JOptionPane.ERROR_MESSAGE);
+				System.exit(1);
+			} else {
+				JOptionPane.showMessageDialog(null, e, "SQL Exception", JOptionPane.ERROR_MESSAGE);
+				System.exit(1);
+			}
 		}
 	}
 	

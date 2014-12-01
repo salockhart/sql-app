@@ -56,9 +56,18 @@ public class Client extends JFrame implements ActionListener{
 	private SQLConnection connection;
 	
 	public static void main(String[] args) {
-		String username, password;
+		String username, password = null;
 		username = JOptionPane.showInputDialog("Username: ");
-		password = JOptionPane.showInputDialog("Password: ");
+		
+		JPasswordField pf = new JPasswordField();
+		int okCxl = JOptionPane.showConfirmDialog(null, pf, "Enter Password", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+
+		if (okCxl == JOptionPane.OK_OPTION) {
+		  password = new String(pf.getPassword());
+		} else {
+			System.err.println("No Password Entered.");
+			System.exit(1);
+		}
 		
 		Client a = new Client(username, password);
 	}
